@@ -1,18 +1,29 @@
-name: Build Docker Image
+name: Build & Publish Docker image
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - main
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+      IMAGE_NAME: myimage123
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Build Openvpn Docker image
-      run: docker build -t kving/openvpn:$(date +\%s) .
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:latest .
+
+    - name: Log in to Docker registry
+      run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" | docker login $DOCKER_REGISTRY -u ${{ secrets.DOCKER_ACCESS_USER }} --password-stdin
+
+    - name: Tag and push Docker image
+      run: |
+        docker tag $DOCKER_REGISTRY/$IMAGE_NAME:latest $DOCKER_REGISTRY/$IMAGE_NAME:latest
+        docker push $DOCKER_REGISTRY/$IMAGE_NAME:latest
