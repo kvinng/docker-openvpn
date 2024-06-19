@@ -318,6 +318,7 @@ if [ ${#OVPN_EXTRA_CLIENT_CONFIG[@]} -gt 0 ]; then
 fi
 
 cat > "$conf" <<EOF
+topology subnet
 server $(getroute $OVPN_SERVER)
 verb 3
 key $EASYRSA_PKI/private/${OVPN_CN}.key
@@ -347,8 +348,14 @@ else
 fi
 
 [ -n "$OVPN_TLS_CIPHER" ] && echo "tls-cipher $OVPN_TLS_CIPHER" >> "$conf"
-[ -n "$OVPN_CIPHER" ] && echo "cipher $OVPN_CIPHER" >> "$conf"
+#[ -n "$OVPN_CIPHER" ] && echo "cipher $OVPN_CIPHER" >> "$conf"
 [ -n "$OVPN_AUTH" ] && echo "auth $OVPN_AUTH" >> "$conf"
+if [ -n "$OVPN_CIPHER" ]; then 
+  echo "cipher $OVPN_CIPHER" >> "$conf"
+else
+  echo "cipher AES-256-GCM" >> "$conf"
+  echo "data-ciphers-fallback BF-CBC" >> "$conf"
+fi
 
 [ -n "${OVPN_CLIENT_TO_CLIENT:-}" ] && echo "client-to-client" >> "$conf"
 [ "$OVPN_COMP_LZO" == "1" ] && echo "comp-lzo" >> "$conf"
