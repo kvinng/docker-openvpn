@@ -354,7 +354,7 @@ if [ -n "$OVPN_CIPHER" ]; then
   echo "cipher $OVPN_CIPHER" >> "$conf"
 else
   echo "cipher AES-256-GCM" >> "$conf"
-  echo "data-ciphers-fallback BF-CBC" >> "$conf"
+  #echo "data-ciphers-fallback BF-CBC" >> "$conf"
 fi
 
 [ -n "${OVPN_CLIENT_TO_CLIENT:-}" ] && echo "client-to-client" >> "$conf"
